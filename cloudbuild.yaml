@@ -9,7 +9,7 @@ steps:
   - '-c'
   - |
     gcloud container clusters get-credentials --project="ikeegai-sg" --zone="asia-southeast1-c" "ikeegai-sg"
-    if [ "$BRANCH_NAME" == "develop" ]; then
+    if [ "$BRANCH_NAME" == "livemore/develop" ]; then
       kubectl set image deployment livemore-nodebb-staging livemore-nodebb=asia.gcr.io/ikeegai-sg/livemore-nodebb:$REVISION_ID
     fi
     if [[ "$TAG_NAME" =~ release ]]; then
