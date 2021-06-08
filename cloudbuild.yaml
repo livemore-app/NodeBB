@@ -1,0 +1,21 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'asia.gcr.io/ikeegai-sg/livemore-nodebb:$REVISION_ID', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ["push", "asia.gcr.io/ikeegai-sg/livemore-nodebb:$REVISION_ID"]
+- name: 'gcr.io/cloud-builders/kubectl'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    gcloud container clusters get-credentials --project="ikeegai-sg" --zone="asia-southeast1-c" "ikeegai-sg"
+    if [ "$BRANCH_NAME" == "develop" ]; then
+      kubectl set image deployment livemore-nodebb-staging livemore-nodebb=asia.gcr.io/ikeegai-sg/livemore-nodebb:$REVISION_ID
+    fi
+    if [[ "$TAG_NAME" =~ release ]]; then
+      kubectl set image deployment livemore-nodebb livemore-nodebb=asia.gcr.io/ikeegai-sg/livemore-nodebb:$REVISION_ID
+    fi
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=asia-southeast1-c'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=ikeegai-sg'
+images: ['asia.gcr.io/ikeegai-sg/livemore-nodebb']
